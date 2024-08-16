@@ -6,12 +6,12 @@ import (
 
 	prompt "github.com/c-bata/go-prompt"
 	"github.com/c-bata/go-prompt/completer"
-	"github.com/c-bata/kube-prompt/internal/debug"
-	"github.com/c-bata/kube-prompt/kube"
+	"github.com/jiqinga/kube-prompt/internal/debug"
+	"github.com/jiqinga/kube-prompt/kube"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
+	//_ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 )
 
 var (
