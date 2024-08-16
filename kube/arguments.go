@@ -36,6 +36,7 @@ var commands = []prompt.Suggest{
 	{Text: "explain", Description: "资源文档"},
 	{Text: "convert", Description: "在不同的 API 版本之间转换配置文件 "},
 	{Text: "top", Description: "显示资源 (CPU/Memory/Storage) 使用情况"},
+	{Text: "kustomize", Description: "从目录或远程 URL 构建一个自定义（kustomization）目标 "},
 
 	// Custom command.
 	{Text: "exit", Description: "退出此程序"},
