@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR=$(cd $(dirname $0); pwd)
-KUBE_DIR=$(cd $(dirname $(dirname $0)); pwd)/kube
+KUBE_DIR=$(cd $(dirname $DIR); pwd)/kube
 
 # clean generated files
 rm ${KUBE_DIR}/*.gen.go
@@ -9,10 +9,16 @@ mkdir -p bin
 
 set -e
 
-go build -o ./bin/option-gen ./_tools/option-gen/main.go
+go build -o ./bin/option-gen ./main.go
 
 subcmds=(
     "get"
+    "set env"
+    "set image"
+    "set resources"
+    "set selector"
+    "set serviceaccount"
+    "set subject"
     "describe"
     "create"
     "replace"
@@ -39,17 +45,26 @@ subcmds=(
     "explain"
     "cordon"
     "drain"
+    "taint"
     "uncordon"
     "annotate"
     "convert"
     "top node"
     "top pod"
-    "cluster-info"
+    "cluster-info dump"
     "config get-contexts"
     "config set"
     "config set-cluster"
     "config set-credentials"
     "config view"
+    "certificate approve"
+    "certificate deny"
+    "cp"
+    "auth can-i"
+    "auth reconcile"
+    "diff"
+    "wait"
+    "plugin list"
 )
 
 for cmd in "${subcmds[@]}"; do
