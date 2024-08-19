@@ -7,11 +7,14 @@ import (
 )
 
 var rolloutStatusOptions = []prompt.Suggest{
-	{Text: "-f", Description: "Filename, directory, or URL to files identifying the resource to get from a server."},
-	{Text: "--filename", Description: "Filename, directory, or URL to files identifying the resource to get from a server."},
-	{Text: "-R", Description: "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory."},
-	{Text: "--recursive", Description: "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory."},
-	{Text: "--revision", Description: "Pin to a specific revision for showing its status. Defaults to 0 (last revision)."},
-	{Text: "-w", Description: "Watch the status of the rollout until it's done."},
-	{Text: "--watch", Description: "Watch the status of the rollout until it's done."},
+	{Text: "-f", Description: "文件名、目录或指向文件的 URL，用于标识要从服务器获取的资源。 "},
+	{Text: "--filename", Description: "文件名、目录或指向文件的 URL，用于标识要从服务器获取的资源。 "},
+	{Text: "-k", Description: "处理 kustomization 目录。此标志不能与 -f 或 -R 一起使用。 "},
+	{Text: "--kustomize", Description: "处理 kustomization 目录。此标志不能与 -f 或 -R 一起使用。 "},
+	{Text: "-R", Description: "递归处理在 -f、--filename 中使用的目录。当您想要管理在同一目录中组织的相关清单时很有用。 "},
+	{Text: "--recursive", Description: "递归处理在 -f、--filename 中使用的目录。当您想要管理在同一目录中组织的相关清单时很有用。 "},
+	{Text: "--revision", Description: "固定到特定的修订版本以显示其状态。默认值为 0（最后一个修订版本）。 "},
+	{Text: "--timeout", Description: "在结束观察前等待的时长，零表示永远不结束。任何其他值都应包含相应的时间单位（例如 1 秒、2 分钟、3 小时）。 "},
+	{Text: "-w", Description: "观察部署的状态，直到其完成。 "},
+	{Text: "--watch", Description: "观察部署的状态，直到其完成。 "},
 }

@@ -7,17 +7,12 @@ import (
 )
 
 var configViewOptions = []prompt.Suggest{
-	{Text: "--allow-missing-template-keys", Description: "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats."},
-	{Text: "--flatten", Description: "Flatten the resulting kubeconfig file into self-contained output (useful for creating portable kubeconfig files)"},
-	{Text: "--merge", Description: "Merge the full hierarchy of kubeconfig files"},
-	{Text: "--minify", Description: "Remove all information not used by current-context from the output"},
-	{Text: "--no-headers", Description: "When using the default or custom-column output format, don't print headers (default print headers)."},
-	{Text: "-o", Description: "Output format. One of: json|yaml|wide|name|custom-columns=...|custom-columns-file=...|go-template=...|go-template-file=...|jsonpath=...|jsonpath-file=... See custom columns [http://kubernetes.io/docs/user-guide/kubectl-overview/#custom-columns], golang template [http://golang.org/pkg/text/template/#pkg-overview] and jsonpath template [http://kubernetes.io/docs/user-guide/jsonpath]."},
-	{Text: "--output", Description: "Output format. One of: json|yaml|wide|name|custom-columns=...|custom-columns-file=...|go-template=...|go-template-file=...|jsonpath=...|jsonpath-file=... See custom columns [http://kubernetes.io/docs/user-guide/kubectl-overview/#custom-columns], golang template [http://golang.org/pkg/text/template/#pkg-overview] and jsonpath template [http://kubernetes.io/docs/user-guide/jsonpath]."},
-	{Text: "--raw", Description: "Display raw byte data"},
-	{Text: "-a", Description: "When printing, show all resources (default show all pods including terminated one.)"},
-	{Text: "--show-all", Description: "When printing, show all resources (default show all pods including terminated one.)"},
-	{Text: "--show-labels", Description: "When printing, show all labels as the last column (default hide labels column)"},
-	{Text: "--sort-by", Description: "If non-empty, sort list types using this field specification.  The field specification is expressed as a JSONPath expression (e.g. '{.metadata.name}'). The field in the API resource specified by this JSONPath expression must be an integer or a string."},
-	{Text: "--template", Description: "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview]."},
+	{Text: "--allow-missing-template-keys", Description: "如果为真，在模板中缺少字段或映射键时，忽略模板中的任何错误。仅适用于 golang 和 jsonpath 输出格式。 "},
+	{Text: "--flatten", Description: "将生成的 kubeconfig 文件展平为自包含的输出（适用于创建可移植的 kubeconfig 文件） "},
+	{Text: "--merge", Description: "合并 kubeconfig 文件的完整层次结构 "},
+	{Text: "--minify", Description: "从输出中删除当前上下文未使用的所有信息 "},
+	{Text: "-o", Description: "输出格式。其中之一 :  json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file."},
+	{Text: "--output", Description: "输出格式。其中之一 :  json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file."},
+	{Text: "--raw", Description: "显示原始字节数据 "},
+	{Text: "--template", Description: "在 -o=go-template 或 -o=go-template-file 时使用的模板字符串或模板文件的路径。该模板格式为 Go 语言模板 [http] : //golang.org/pkg/text/template/#pkg-overview]."},
 }

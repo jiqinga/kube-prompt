@@ -7,7 +7,11 @@ import (
 )
 
 var configSetCredentialsOptions = []prompt.Suggest{
-	{Text: "--auth-provider", Description: "Auth provider for the user entry in kubeconfig"},
-	{Text: "--auth-provider-arg", Description: "'key=value' arguments for the auth provider"},
-	{Text: "--embed-certs", Description: "Embed client cert/key for the user entry in kubeconfig"},
+	{Text: "--auth-provider", Description: "kubeconfig 中用户条目的身份验证提供程序 "},
+	{Text: "--auth-provider-arg", Description: "“键=值”形式的参数，用于身份验证提供程序 "},
+	{Text: "--embed-certs", Description: "为 kubeconfig 中的用户条目嵌入客户端证书/密钥 "},
+	{Text: "--exec-api-version", Description: "用户在 kubeconfig 中的执行凭证插件的 API 版本 "},
+	{Text: "--exec-arg", Description: "针对 kubeconfig 中用户条目的 exec 凭证插件命令的新参数 "},
+	{Text: "--exec-command", Description: "用于 kubeconfig 中用户条目的 exec 凭证插件的命令 "},
+	{Text: "--exec-env", Description: "“键=值”形式的用于执行凭证插件的环境值 "},
 }

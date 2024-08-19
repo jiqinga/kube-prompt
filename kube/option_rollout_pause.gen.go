@@ -7,8 +7,14 @@ import (
 )
 
 var rolloutPauseOptions = []prompt.Suggest{
-	{Text: "-f", Description: "Filename, directory, or URL to files identifying the resource to get from a server."},
-	{Text: "--filename", Description: "Filename, directory, or URL to files identifying the resource to get from a server."},
-	{Text: "-R", Description: "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory."},
-	{Text: "--recursive", Description: "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory."},
+	{Text: "--allow-missing-template-keys", Description: "如果为真，在模板中缺少字段或映射键时，忽略模板中的任何错误。仅适用于 golang 和 jsonpath 输出格式。 "},
+	{Text: "-f", Description: "文件名、目录或 URL 到文件，用于标识要从服务器获取的资源。 "},
+	{Text: "--filename", Description: "文件名、目录或 URL 到文件，用于标识要从服务器获取的资源。 "},
+	{Text: "-k", Description: "处理 kustomization 目录。此标志不能与 -f 或 -R 一起使用。 "},
+	{Text: "--kustomize", Description: "处理 kustomization 目录。此标志不能与 -f 或 -R 一起使用。 "},
+	{Text: "-o", Description: "输出格式。其中之一 :  json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file."},
+	{Text: "--output", Description: "输出格式。其中之一 :  json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file."},
+	{Text: "-R", Description: "对在 -f、--filename 中使用的目录进行递归处理。当您想要管理在同一目录中组织的相关清单时很有用。 "},
+	{Text: "--recursive", Description: "对在 -f、--filename 中使用的目录进行递归处理。当您想要管理在同一目录中组织的相关清单时很有用。 "},
+	{Text: "--template", Description: "当 -o=go-template 或 -o=go-template-file 时使用的模板字符串或模板文件的路径。该模板格式为 Go 语言模板 [http] : //golang.org/pkg/text/template/#pkg-overview]."},
 }

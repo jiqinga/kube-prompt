@@ -7,8 +7,7 @@ import (
 )
 
 var configGetContextsOptions = []prompt.Suggest{
-	{Text: "--allow-missing-template-keys", Description: "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats."},
-	{Text: "--no-headers", Description: "When using the default or custom-column output format, don't print headers (default print headers)."},
-	{Text: "-o", Description: "Output format. One of: json|yaml|wide|name|custom-columns=...|custom-columns-file=...|go-template=...|go-template-file=...|jsonpath=...|jsonpath-file=... See custom columns [http://kubernetes.io/docs/user-guide/kubectl-overview/#custom-columns], golang template [http://golang.org/pkg/text/template/#pkg-overview] and jsonpath template [http://kubernetes.io/docs/user-guide/jsonpath]."},
-	{Text: "--output", Description: "Output format. One of: json|yaml|wide|name|custom-columns=...|custom-columns-file=...|go-template=...|go-template-file=...|jsonpath=...|jsonpath-file=... See custom columns [http://kubernetes.io/docs/user-guide/kubectl-overview/#custom-columns], golang template [http://golang.org/pkg/text/template/#pkg-overview] and jsonpath template [http://kubernetes.io/docs/user-guide/jsonpath]."},
+	{Text: "--no-headers", Description: "在使用默认或自定义列的输出格式时，不打印标题（默认会打印标题）。 "},
+	{Text: "-o", Description: "输出格式。其中之一 :  name"},
+	{Text: "--output", Description: "输出格式。其中之一 :  name"},
 }

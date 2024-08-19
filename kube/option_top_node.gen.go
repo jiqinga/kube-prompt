@@ -7,10 +7,12 @@ import (
 )
 
 var topNodeOptions = []prompt.Suggest{
-	{Text: "--heapster-namespace", Description: "Namespace Heapster service is located in"},
-	{Text: "--heapster-port", Description: "Port name in service to use"},
-	{Text: "--heapster-scheme", Description: "Scheme (http or https) to connect to Heapster as"},
-	{Text: "--heapster-service", Description: "Name of Heapster service"},
-	{Text: "-l", Description: "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2)"},
-	{Text: "--selector", Description: "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2)"},
+	{Text: "--heapster-namespace", Description: "命名空间 Heapster 服务所在位置 "},
+	{Text: "--heapster-port", Description: "服务中要使用的端口名称 "},
+	{Text: "--heapster-scheme", Description: "连接到 Heapster 所使用的方案（http 或 https） "},
+	{Text: "--heapster-service", Description: "堆存器服务的名称 "},
+	{Text: "--no-headers", Description: "如果存在，打印输出时不包含标题。 "},
+	{Text: "-l", Description: "选择器（标签查询）用于筛选，支持 '='、'==' 和 '!=' 。（例如 -l key1=value1,key2=value2） "},
+	{Text: "--selector", Description: "选择器（标签查询）用于筛选，支持 '='、'==' 和 '!=' 。（例如 -l key1=value1,key2=value2） "},
+	{Text: "--sort-by", Description: "如果不为空，则使用指定字段对节点列表进行排序。该字段可以是“cpu”或“memory”。 "},
 }

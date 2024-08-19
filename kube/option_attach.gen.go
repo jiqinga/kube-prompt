@@ -7,11 +7,11 @@ import (
 )
 
 var attachOptions = []prompt.Suggest{
-	{Text: "-c", Description: "Container name. If omitted, the first container in the pod will be chosen"},
-	{Text: "--container", Description: "Container name. If omitted, the first container in the pod will be chosen"},
-	{Text: "--pod-running-timeout", Description: "The length of time (like 5s, 2m, or 3h, higher than zero) to wait until at least one pod is running"},
-	{Text: "-i", Description: "Pass stdin to the container"},
-	{Text: "--stdin", Description: "Pass stdin to the container"},
-	{Text: "-t", Description: "Stdin is a TTY"},
-	{Text: "--tty", Description: "Stdin is a TTY"},
+	{Text: "-c", Description: "容器名称。如果省略，将选择 Pod 中的第一个容器 "},
+	{Text: "--container", Description: "容器名称。如果省略，将选择 Pod 中的第一个容器 "},
+	{Text: "--pod-running-timeout", Description: "等待至少一个 Pod 处于运行状态的时长（例如 5 秒、2 分钟或 3 小时，大于零） "},
+	{Text: "-i", Description: "将标准输入传递到容器 "},
+	{Text: "--stdin", Description: "将标准输入传递到容器 "},
+	{Text: "-t", Description: "标准输入是一个终端设备（TTY） "},
+	{Text: "--tty", Description: "标准输入是一个终端设备（TTY） "},
 }

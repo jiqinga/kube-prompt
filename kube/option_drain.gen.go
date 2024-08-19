@@ -7,13 +7,13 @@ import (
 )
 
 var drainOptions = []prompt.Suggest{
-	{Text: "--delete-local-data", Description: "Continue even if there are pods using emptyDir (local data that will be deleted when the node is drained)."},
-	{Text: "--dry-run", Description: "If true, only print the object that would be sent, without sending it."},
-	{Text: "--force", Description: "Continue even if there are pods not managed by a ReplicationController, ReplicaSet, Job, DaemonSet or StatefulSet."},
-	{Text: "--grace-period", Description: "Period of time in seconds given to each pod to terminate gracefully. If negative, the default value specified in the pod will be used."},
-	{Text: "--ignore-daemonsets", Description: "Ignore DaemonSet-managed pods."},
-	{Text: "--pod-selector", Description: "Label selector to filter pods on the node"},
-	{Text: "-l", Description: "Selector (label query) to filter on"},
-	{Text: "--selector", Description: "Selector (label query) to filter on"},
-	{Text: "--timeout", Description: "The length of time to wait before giving up, zero means infinite"},
+	{Text: "--delete-local-data", Description: "即使存在使用 emptyDir（当节点排空时将被删除的本地数据）的 Pod，也继续操作。 "},
+	{Text: "--dry-run", Description: "如果为真，仅打印将要发送的对象，而不实际发送。 "},
+	{Text: "--force", Description: "即使存在不由复制控制器、副本集、作业、守护进程集或有状态集管理的 Pod，也继续执行。 "},
+	{Text: "--grace-period", Description: "每个 Pod 优雅终止的时间（以秒为单位）。如果为负数，则使用 Pod 中指定的默认值。 "},
+	{Text: "--ignore-daemonsets", Description: "忽略由 DaemonSet 管理的 Pod。 "},
+	{Text: "--pod-selector", Description: "用于在节点上筛选 Pod 的标签选择器 "},
+	{Text: "-l", Description: "选择器（标签查询）用于筛选 "},
+	{Text: "--selector", Description: "选择器（标签查询）用于筛选 "},
+	{Text: "--timeout", Description: "在放弃之前等待的时长，零表示无限。 "},
 }

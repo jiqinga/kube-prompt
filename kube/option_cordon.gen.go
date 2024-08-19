@@ -7,7 +7,7 @@ import (
 )
 
 var cordonOptions = []prompt.Suggest{
-	{Text: "--dry-run", Description: "If true, only print the object that would be sent, without sending it."},
-	{Text: "-l", Description: "Selector (label query) to filter on"},
-	{Text: "--selector", Description: "Selector (label query) to filter on"},
+	{Text: "--dry-run", Description: "如果为真，仅打印将被发送的对象，而不实际发送。 "},
+	{Text: "-l", Description: "选择器（标签查询）用于筛选 "},
+	{Text: "--selector", Description: "选择器（标签查询）用于筛选 "},
 }

@@ -7,5 +7,5 @@ import (
 )
 
 var configSetOptions = []prompt.Suggest{
-	{Text: "--set-raw-bytes", Description: "When writing a []byte PROPERTY_VALUE, write the given string directly without base64 decoding."},
+	{Text: "--set-raw-bytes", Description: "当编写 []byte 类型的 PROPERTY_VALUE 时，直接写入给定的字符串，无需进行 base64 解码。 "},
 }

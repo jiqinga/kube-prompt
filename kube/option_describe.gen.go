@@ -7,14 +7,15 @@ import (
 )
 
 var describeOptions = []prompt.Suggest{
-	{Text: "--all-namespaces", Description: "If present, list the requested object(s) across all namespaces. Namespace in current context is ignored even if specified with --namespace."},
-	{Text: "-f", Description: "Filename, directory, or URL to files containing the resource to describe"},
-	{Text: "--filename", Description: "Filename, directory, or URL to files containing the resource to describe"},
-	{Text: "--include-extended-apis", Description: "If true, include definitions of new APIs via calls to the API server. [default true]"},
-	{Text: "--include-uninitialized", Description: "If true, the kubectl command applies to uninitialized objects. If explicitly set to false, this flag overrides other flags that make the kubectl commands apply to uninitialized objects, e.g., \"--all\". Objects with empty metadata.initializers are regarded as initialized."},
-	{Text: "-R", Description: "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory."},
-	{Text: "--recursive", Description: "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory."},
-	{Text: "-l", Description: "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2)"},
-	{Text: "--selector", Description: "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2)"},
-	{Text: "--show-events", Description: "If true, display events related to the described object."},
+	{Text: "-A", Description: "如果存在，列出所有命名空间中的请求对象。即使使用 --namespace 指定，当前上下文中的命名空间也会被忽略。 "},
+	{Text: "--all-namespaces", Description: "如果存在，列出所有命名空间中的请求对象。即使使用 --namespace 指定，当前上下文中的命名空间也会被忽略。 "},
+	{Text: "-f", Description: "文件名、目录或包含要描述的资源的文件的 URL "},
+	{Text: "--filename", Description: "文件名、目录或包含要描述的资源的文件的 URL "},
+	{Text: "-k", Description: "处理 kustomization 目录。此标志不能与 -f 或 -R 一起使用。 "},
+	{Text: "--kustomize", Description: "处理 kustomization 目录。此标志不能与 -f 或 -R 一起使用。 "},
+	{Text: "-R", Description: "递归处理在 -f 、--filename 中使用的目录。当您想要管理在同一目录中组织的相关清单时很有用。 "},
+	{Text: "--recursive", Description: "递归处理在 -f 、--filename 中使用的目录。当您想要管理在同一目录中组织的相关清单时很有用。 "},
+	{Text: "-l", Description: "选择器（标签查询）用于筛选，支持 '='、'==' 和 '!=' 。（例如：-l key1=value1,key2=value2） "},
+	{Text: "--selector", Description: "选择器（标签查询）用于筛选，支持 '='、'==' 和 '!=' 。（例如：-l key1=value1,key2=value2） "},
+	{Text: "--show-events", Description: "如果为真，则显示与所描述对象相关的事件。 "},
 }

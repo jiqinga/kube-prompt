@@ -7,5 +7,6 @@ import (
 )
 
 var portForwardOptions = []prompt.Suggest{
-	{Text: "--pod-running-timeout", Description: "The length of time (like 5s, 2m, or 3h, higher than zero) to wait until at least one pod is running"},
+	{Text: "--address", Description: "要监听的地址（以逗号分隔）。仅接受 IP 地址或“localhost”作为值。当提供“localhost”时，kubectl 将尝试绑定在 127.0.0.1 和 ......  上 : : 1 and will fail if neither of these addresses are available to bind."},
+	{Text: "--pod-running-timeout", Description: "等待至少一个 Pod 处于运行状态的时长（例如 5 秒、2 分钟或 3 小时，大于零） "},
 }

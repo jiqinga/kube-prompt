@@ -7,12 +7,15 @@ import (
 )
 
 var topPodOptions = []prompt.Suggest{
-	{Text: "--all-namespaces", Description: "If present, list the requested object(s) across all namespaces. Namespace in current context is ignored even if specified with --namespace."},
-	{Text: "--containers", Description: "If present, print usage of containers within a pod."},
-	{Text: "--heapster-namespace", Description: "Namespace Heapster service is located in"},
-	{Text: "--heapster-port", Description: "Port name in service to use"},
-	{Text: "--heapster-scheme", Description: "Scheme (http or https) to connect to Heapster as"},
-	{Text: "--heapster-service", Description: "Name of Heapster service"},
-	{Text: "-l", Description: "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2)"},
-	{Text: "--selector", Description: "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2)"},
+	{Text: "-A", Description: "如果存在，列出所有命名空间中的请求对象。即使使用 --namespace 指定，当前上下文中的命名空间也会被忽略。 "},
+	{Text: "--all-namespaces", Description: "如果存在，列出所有命名空间中的请求对象。即使使用 --namespace 指定，当前上下文中的命名空间也会被忽略。 "},
+	{Text: "--containers", Description: "如果存在，打印 Pod 内容器的使用情况。 "},
+	{Text: "--heapster-namespace", Description: "命名空间 Heapster 服务所在的位置 "},
+	{Text: "--heapster-port", Description: "服务中要使用的端口名称 "},
+	{Text: "--heapster-scheme", Description: "连接到 Heapster 所用的方案（http 或 https） "},
+	{Text: "--heapster-service", Description: "Heapster 服务的名称 "},
+	{Text: "--no-headers", Description: "如果存在，打印输出时不带表头。 "},
+	{Text: "-l", Description: "选择器（标签查询）用于筛选，支持 '='、'==' 和 '!=' 。（例如： -l key1=value1,key2=value2 ） "},
+	{Text: "--selector", Description: "选择器（标签查询）用于筛选，支持 '='、'==' 和 '!=' 。（例如： -l key1=value1,key2=value2 ） "},
+	{Text: "--sort-by", Description: "如果不为空，使用指定字段对 Pod 列表进行排序。该字段可以是“cpu”或“memory”。 "},
 }

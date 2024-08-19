@@ -7,5 +7,5 @@ import (
 )
 
 var configSetClusterOptions = []prompt.Suggest{
-	{Text: "--embed-certs", Description: "embed-certs for the cluster entry in kubeconfig"},
+	{Text: "--embed-certs", Description: "在 kubeconfig 中为集群条目嵌入证书 "},
 }

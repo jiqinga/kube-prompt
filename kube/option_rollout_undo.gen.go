@@ -7,10 +7,16 @@ import (
 )
 
 var rolloutUndoOptions = []prompt.Suggest{
-	{Text: "--dry-run", Description: "If true, only print the object that would be sent, without sending it."},
-	{Text: "-f", Description: "Filename, directory, or URL to files identifying the resource to get from a server."},
-	{Text: "--filename", Description: "Filename, directory, or URL to files identifying the resource to get from a server."},
-	{Text: "-R", Description: "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory."},
-	{Text: "--recursive", Description: "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory."},
-	{Text: "--to-revision", Description: "The revision to rollback to. Default to 0 (last revision)."},
+	{Text: "--allow-missing-template-keys", Description: "如果为真，当模板中缺少字段或映射键时，忽略模板中的任何错误。仅适用于 golang 和 jsonpath 输出格式。 "},
+	{Text: "--dry-run", Description: "如果为真，仅打印将被发送的对象，而不实际发送。 "},
+	{Text: "-f", Description: "文件名、目录或指向文件的 URL，用于标识要从服务器获取的资源。 "},
+	{Text: "--filename", Description: "文件名、目录或指向文件的 URL，用于标识要从服务器获取的资源。 "},
+	{Text: "-k", Description: "处理 kustomization 目录。此标志不能与 -f 或 -R 一起使用。 "},
+	{Text: "--kustomize", Description: "处理 kustomization 目录。此标志不能与 -f 或 -R 一起使用。 "},
+	{Text: "-o", Description: "输出格式。其中之一 :  json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file."},
+	{Text: "--output", Description: "输出格式。其中之一 :  json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file."},
+	{Text: "-R", Description: "递归处理 -f 或 --filename 中使用的目录。当您想要管理在同一目录中组织的相关清单时非常有用。 "},
+	{Text: "--recursive", Description: "递归处理 -f 或 --filename 中使用的目录。当您想要管理在同一目录中组织的相关清单时非常有用。 "},
+	{Text: "--template", Description: "在 -o=go-template 或 -o=go-template-file 时使用的模板字符串或模板文件的路径。模板格式为 golang 模板 [http] : //golang.org/pkg/text/template/#pkg-overview]."},
+	{Text: "--to-revision", Description: "要回滚到的修订版本。默认为 0（最新修订版）。 "},
 }

@@ -7,7 +7,6 @@ import (
 )
 
 var explainOptions = []prompt.Suggest{
-	{Text: "--api-version", Description: "Get different explanations for particular API version"},
-	{Text: "--include-extended-apis", Description: "If true, include definitions of new APIs via calls to the API server. [default true]"},
-	{Text: "--recursive", Description: "Print the fields of fields (Currently only 1 level deep)"},
+	{Text: "--api-version", Description: "获取特定 API 版本的不同解释 "},
+	{Text: "--recursive", Description: "打印字段的字段（目前仅支持 1 层深度） "},
 }
