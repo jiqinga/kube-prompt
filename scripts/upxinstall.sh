@@ -5,5 +5,9 @@ wget https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-amd64_linux.t
 tar -xvJf upx-4.2.4-amd64_linux.tar.xz
 echo $PATH
 which upx
-apt-get uninstall -y upx
+if dpkg -s upx &> /dev/null; then
+    apt-get remove -y upx
+else
+    echo "upx is not installed"
+fi
 which upx

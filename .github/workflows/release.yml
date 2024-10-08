@@ -1,5 +1,4 @@
-name: ReleaseDtools
-
+name: Releasekube-prompt
 env:
   GO_VERSION: 1.18.x
 on:
