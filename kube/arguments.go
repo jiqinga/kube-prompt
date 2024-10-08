@@ -1,6 +1,8 @@
 package kube
 
-import prompt "github.com/c-bata/go-prompt"
+import (
+	"github.com/c-bata/go-prompt"
+)
 
 var commands = []prompt.Suggest{
 	{Text: "get", Description: "显示一个或多个资源"},
@@ -24,7 +26,6 @@ var commands = []prompt.Suggest{
 	{Text: "proxy", Description: "运行到 Kubernetes API 服务器的代理 "},
 	{Text: "run", Description: "在集群上运行特定的镜像"},
 	{Text: "expose", Description: "获取一个controller, service, pod 并将其作为新的 Kubernetes 服务进行公开"},
-	{Text: "expose", Description: "获取一个controller, service, pod 并将其作为新的 Kubernetes 服务进行公开"},
 	{Text: "autoscale", Description: "自动缩放Deployment, ReplicaSet, ReplicationController"},
 	{Text: "rollout", Description: "管理资源"},
 	{Text: "label", Description: "更新资源上的标签"},
@@ -36,8 +37,9 @@ var commands = []prompt.Suggest{
 	{Text: "explain", Description: "资源文档"},
 	{Text: "convert", Description: "在不同的 API 版本之间转换配置文件 "},
 	{Text: "top", Description: "显示资源 (CPU/Memory/Storage) 使用情况"},
+	{Text: "cp", Description: "在容器与外部之间复制文件和目录。"},
 	{Text: "kustomize", Description: "从目录或远程 URL 构建一个自定义（kustomization）目标 "},
-
+	{Text: "set", Description: "设置各种 Kubernetes 资源"},
 	// Custom command.
 	{Text: "exit", Description: "退出此程序"},
 }
@@ -60,7 +62,7 @@ var resourceTypes = []prompt.Suggest{
 	{Text: "nodes"},
 	{Text: "persistentvolumeclaims"},
 	{Text: "persistentvolumes"},
-	{Text: "pod"},
+	{Text: "pod", Description: "显示一个或多个pod"},
 	{Text: "podsecuritypolicies"},
 	{Text: "podtemplates"},
 	{Text: "replicasets"},
@@ -95,7 +97,7 @@ var resourceTypes = []prompt.Suggest{
 	{Text: "svc"},
 }
 
-func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt.Suggest {
+func (c *Completer) argumentsCompleter(namespace string, args []string, d prompt.Document) []prompt.Suggest {
 	if len(args) <= 1 {
 		return prompt.FilterHasPrefix(commands, args[0], true)
 	}
@@ -205,6 +207,29 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 				return prompt.FilterContains(getJobSuggestions(c.client, namespace), third, true)
 			}
 		}
+	case "set":
+		second := args[1]
+		if len(args) == 2 {
+			subcommands := []prompt.Suggest{
+				{Text: "ns", Description: "设置默认命名空间"},
+				{Text: "namespace", Description: "设置默认命名空间"},
+				{Text: "env", Description: "更新 Pod 模板上的环境变量。"},
+				{Text: "image", Description: "更新 Pod 模板的镜像。"},
+				{Text: "resources", Description: "更新带有 Pod 模板的对象上的资源请求和限制。"},
+				{Text: "selector", Description: "设置资源上的选择器"},
+				{Text: "serviceaccount", Description: "更新资源的服务账号"},
+				{Text: "subject", Description: "更新角色绑定（RoleBinding）或集群角色绑定（ClusterRoleBinding）中的用户、组或服务账号"},
+			}
+			return prompt.FilterHasPrefix(subcommands, second, true)
+		}
+		third := args[2]
+		if len(args) == 3 {
+			switch second {
+			case "ns", "namespace":
+
+				return prompt.FilterContains(getNameSpaceSuggestions(c.namespaceList), third, true)
+			}
+		}
 	case "describe":
 		second := args[1]
 		if len(args) == 2 {
@@ -260,13 +285,21 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		}
 	case "create":
 		subcommands := []prompt.Suggest{
-			{Text: "configmap", Description: "Create a configmap from a local file, directory or literal value"},
-			{Text: "deployment", Description: "Create a deployment with the specified name."},
-			{Text: "namespace", Description: "Create a namespace with the specified name"},
-			{Text: "quota", Description: "Create a quota with the specified name."},
-			{Text: "secret", Description: "Create a secret using specified subcommand"},
-			{Text: "service", Description: "Create a service using specified subcommand."},
-			{Text: "serviceaccount", Description: "Create a service account with the specified name"},
+			{Text: "configmap", Description: "从本地文件、目录或者直接给定的字面量值创建一个配置映射（ConfigMap）。"},
+			{Text: "deployment", Description: "创建一个具有指定名称的部署（Deployment）。"},
+			{Text: "namespace", Description: "创建一个具有指定名称的命名空间。"},
+			{Text: "quota", Description: "创建一个具有指定名称的资源配额。"},
+			{Text: "secret", Description: "使用指定的子命令创建一个密钥（secret）。"},
+			{Text: "service", Description: "使用指定的子命令创建一个服务。"},
+			{Text: "serviceaccount", Description: "创建一个具有指定名称的服务账号。"},
+			{Text: "clusterrole", Description: "创建一个集群角色。"},
+			{Text: "clusterrolebinding", Description: "为特定的集群角色（ClusterRole）创建一个集群角色绑定（ClusterRoleBinding）。"},
+			{Text: "cronjob", Description: "创建一个具有指定名称的定时任务（CronJob）。"},
+			{Text: "job", Description: "创建一个具有指定名称的任务作业（Job）。"},
+			{Text: "poddisruptionbudget", Description: "创建一个具有指定名称的 Pod 中断预算。"},
+			{Text: "priorityclass", Description: "创建一个具有指定名称的优先级类别。"},
+			{Text: "role", Description: "创建一个包含单个规则的角色。"},
+			{Text: "rolebinding", Description: "为特定的角色（Role）或者集群角色（ClusterRole）创建一个角色绑定（RoleBinding）。"},
 		}
 		if len(args) == 2 {
 			return prompt.FilterHasPrefix(subcommands, args[1], true)
@@ -377,20 +410,20 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 			}
 		}
 
-	case "namespace":
-		if len(args) == 2 {
-			return prompt.FilterContains(getNameSpaceSuggestions(c.namespaceList), args[1], true)
-		}
+	// case "namespace":
+	//	if len(args) == 2 {
+	//		return prompt.FilterContains(getNameSpaceSuggestions(c.namespaceList), args[1], true)
+	//	}
 	case "logs":
 		if len(args) == 2 {
 			return prompt.FilterContains(getPodSuggestions(c.client, namespace), args[1], true)
 		}
-	case "rolling-update", "rollingupdate":
-		if len(args) == 2 {
-			return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), args[1], true)
-		} else if len(args) == 3 {
-			return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), args[2], true)
-		}
+	// case "rolling-update", "rollingupdate":
+	//	if len(args) == 2 {
+	//		return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), args[1], true)
+	//	} else if len(args) == 3 {
+	//		return prompt.FilterContains(getReplicationControllerSuggestions(c.client, namespace), args[2], true)
+	//	}
 	case "scale", "resize":
 		if len(args) == 2 {
 			// Deployment, ReplicaSet, Replication Controller, or Job.
@@ -415,6 +448,31 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		if len(args) == 2 {
 			return prompt.FilterContains(getPodSuggestions(c.client, namespace), args[1], true)
 		}
+	case "cp":
+		// fmt.Println("*********", args, len(args), "*************")
+		// args = compressEmptyStrings(args)
+		// fmt.Println("########", args, len(args), "#############")
+		if len(args) == 2 {
+			// return prompt.FilterContains(lsfiles(args[1], c.client, namespace, c.config, d), args[1], true)
+
+			pathCompletion := lsfiles(args[1], c.client, namespace, c.config, d, false)
+			// 如果补全项只剩下一个就继续补全
+			if len(pathCompletion) == 1 {
+				return lsfiles(pathCompletion[0].Text, c.client, namespace, c.config, d, false)
+			}
+			// 多个补项全直接返回结果
+			return pathCompletion
+			// return prompt.FilterContains(completerfile(args[1], d), args[1], true)
+		}
+		if len(args) == 3 {
+			pathCompletion := lsfiles(args[2], c.client, namespace, c.config, d, true)
+			// 如果补全项只剩下一个就继续补全
+			if len(pathCompletion) == 1 {
+				return lsfiles(pathCompletion[0].Text, c.client, namespace, c.config, d, true)
+			}
+			// 多个补项全直接返回结果
+			return pathCompletion
+		}
 	case "port-forward":
 		if len(args) == 2 {
 			return prompt.FilterContains(getPodSuggestions(c.client, namespace), args[1], true)
@@ -424,10 +482,12 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		}
 	case "rollout":
 		subCommands := []prompt.Suggest{
-			{Text: "history", Description: "view rollout history"},
-			{Text: "pause", Description: "Mark the provided resource as paused"},
-			{Text: "resume", Description: "Resume a paused resource"},
-			{Text: "undo", Description: "undoes a previous rollout"},
+			{Text: "history", Description: "查看部署的滚动更新历史记录。"},
+			{Text: "pause", Description: "将所提供的资源标记为暂停状态。"},
+			{Text: "resume", Description: "恢复一个已暂停的资源。"},
+			{Text: "undo", Description: "撤销上一次的部署（回滚到上一次部署之前的状态）。"},
+			{Text: "restart", Description: "重启一个资源。"},
+			{Text: "status", Description: "展示部署（rollout）的状态。"},
 		}
 		if len(args) == 2 {
 			return prompt.FilterHasPrefix(subCommands, args[1], true)
@@ -435,18 +495,19 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 	case "annotate":
 	case "config":
 		subCommands := []prompt.Suggest{
-			{Text: "current-context", Description: "Displays the current-context"},
-			{Text: "delete-cluster", Description: "Delete the specified cluster from the kubeconfig"},
-			{Text: "delete-context", Description: "Delete the specified context from the kubeconfig"},
-			{Text: "get-clusters", Description: "Display clusters defined in the kubeconfig"},
-			{Text: "get-contexts", Description: "Describe one or many contexts"},
-			{Text: "set", Description: "Sets an individual value in a kubeconfig file"},
-			{Text: "set-cluster", Description: "Sets a cluster entry in kubeconfig"},
-			{Text: "set-context", Description: "Sets a context entry in kubeconfig"},
-			{Text: "set-credentials", Description: "Sets a user entry in kubeconfig"},
-			{Text: "unset", Description: "Unsets an individual value in a kubeconfig file"},
-			{Text: "use-context", Description: "Sets the current-context in a kubeconfig file"},
-			{Text: "view", Description: "Display merged kubeconfig settings or a specified kubeconfig file"},
+			{Text: "current-context", Description: "显示当前上下文。"},
+			{Text: "delete-cluster", Description: "从kubeconfig 中删除指定的集群。"},
+			{Text: "delete-context", Description: "从kubeconfig配置文件中删除指定的上下文环境信息。"},
+			{Text: "get-clusters", Description: "展示在 kubeconfig 中定义的集群。"},
+			{Text: "rename-context", Description: "重命名 kubeconfig 文件中的一个上下文（context）。"},
+			{Text: "get-contexts", Description: "描述一个或者多个上下文环境。"},
+			{Text: "set", Description: "在 kubeconfig 文件中设置单个值。"},
+			{Text: "set-cluster", Description: "在 kubeconfig 中设置一个集群条目。"},
+			{Text: "set-context", Description: "在 kubeconfig 中设置一个上下文项。"},
+			{Text: "set-credentials", Description: "在 kubeconfig 中设置一个用户条目。"},
+			{Text: "unset", Description: "在 kubeconfig（Kubernetes 配置）文件中取消设置单个值。"},
+			{Text: "use-context", Description: "在一个 Kubernetes 配置文件（kubeconfig）中设置当前上下文。"},
+			{Text: "view", Description: "显示合并后的 Kubernetes 配置（kubeconfig）设置或者指定的一个 kubeconfig 文件的内容。"},
 		}
 		if len(args) == 2 {
 			return prompt.FilterHasPrefix(subCommands, args[1], true)
@@ -460,7 +521,7 @@ func (c *Completer) argumentsCompleter(namespace string, args []string) []prompt
 		}
 	case "cluster-info":
 		subCommands := []prompt.Suggest{
-			{Text: "dump", Description: "Dump lots of relevant info for debugging and diagnosis"},
+			{Text: "dump", Description: "输出大量用于调试和诊断的相关信息。"},
 		}
 		if len(args) == 2 {
 			return prompt.FilterHasPrefix(subCommands, args[1], true)
