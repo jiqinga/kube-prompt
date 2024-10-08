@@ -63,7 +63,7 @@ func ConvertToSuggestions(options []string) []prompt.Suggest {
 
 		str := strings.Split(options[i], ":")
 		var modelName string = "ep-20240816164009-58vhd"
-		zhhelp, err := ai.Chat(modelName, fmt.Sprintf("请你将我接下来提供的 kubectl --help 的帮助说明内容，翻译为清晰易懂的中文，不需要详细说明。以下是帮助说明原文: %s", str[1]))
+		zhhelp, err := ai.Chat(modelName, fmt.Sprintf("请你将我接下来提供的 kubectl --help 的帮助说明原文翻译为通俗易懂的中文。如果原文表述不够清晰明了，你可以基于对 kubectl 的了解适当进行补充完善后再翻译，但翻译后的内容需简洁易懂，无需过多解释说明。以下是帮助说明原文: %s", str[1]))
 		if err != nil {
 			fmt.Println(err)
 		}
