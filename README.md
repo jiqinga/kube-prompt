@@ -7,7 +7,7 @@
 
 > 一个具有自动完成功能的交互式Kubernetes客户端,基于[kube-prompt](https://github.com/c-bata/kube-prompt)构建。
 
-![demo](https://github.com/jiqinga/assets/raw/master/kube-prompt/docs/kube-prompt.gif)
+![demo](docs/kube-prompt.gif)
 
 ## ✨ 特性
 
