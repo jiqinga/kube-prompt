@@ -3,21 +3,38 @@ package kube
 import "C"
 import (
 	"bytes"
-	//"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
 
+	"github.com/jiqinga/kubecolor/command"
+
+	//"bytes"
+
 	//"github.com/hidetatz/kubecolor/printer"
 
-	//"github.com/hidetatz/kubecolor/command"
 	//"github.com/hidetatz/kubecolor/kubectl"
 	"github.com/jiqinga/kube-prompt/internal/debug"
 )
 
-var globalState sync.Map
+var (
+	globalState sync.Map
+	Version     = "unset"
+)
+
+func color(kargs, env []string) string {
+	_ = command.Run(kargs[1:], Version, env)
+	//if err != nil {
+	//	var ke *command.KubectlError
+	//	if errors.As(err, &ke) {
+	//		os.Exit(ke.ExitCode)
+	//	}
+	//	os.Exit(1)
+	//}
+	return ""
+}
 
 func Executor(s string) {
 	s = strings.TrimSpace(s)
@@ -25,7 +42,13 @@ func Executor(s string) {
 	if s == "" {
 		return
 	} else if s == "quit" || s == "exit" {
+		// 修复退出时导致终端字符不显示
+		cmd := exec.Command("reset")
+		_ = cmd.Run()
 		fmt.Println("Bye!")
+
+		os.Remove(Getns("KUBECONFIG"))
+
 		os.Exit(0)
 		return
 	}
@@ -55,27 +78,27 @@ func Executor(s string) {
 		// 键 "KUBECONFIG" 存在
 		env = append(env, fmt.Sprintf("KUBECONFIG=%s", value))
 	}
-
-	shell := os.Getenv("SHELL")
-	if shell == "" {
-		shell = "/bin/sh"
-	}
-
-	// 获取当前工作目录
-	pwd, err := os.Getwd()
-	if err != nil {
-		pwd = "/"
-	}
-	fmt.Println(s)
-	cmd := exec.Command(shell, "-c", "kubectl "+s)
-	cmd.Env = env
-	cmd.Dir = pwd
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fmt.Printf("Got error: %s\n", err.Error())
-	}
+	color(strings.Fields("kubectl "+s), env)
+	//
+	//shell := os.Getenv("SHELL")
+	//if shell == "" {
+	//	shell = "/bin/sh"
+	//}
+	//
+	//// 获取当前工作目录
+	//pwd, err := os.Getwd()
+	//if err != nil {
+	//	pwd = "/"
+	//}
+	//cmd := exec.Command(shell, "-c", "kubectl "+s)
+	//cmd.Env = env
+	//cmd.Dir = pwd
+	//cmd.Stdin = os.Stdin
+	//cmd.Stdout = os.Stdout
+	//cmd.Stderr = os.Stderr
+	//if err := cmd.Run(); err != nil {
+	//	fmt.Printf("Got error: %s\n", err.Error())
+	//}
 
 	return
 }
