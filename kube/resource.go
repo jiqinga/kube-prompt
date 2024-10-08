@@ -1,14 +1,24 @@
 package kube
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	prompt "github.com/c-bata/go-prompt"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
+
+	"k8s.io/client-go/tools/remotecommand"
+
+	"github.com/c-bata/go-prompt"
 	"github.com/jiqinga/kube-prompt/internal/debug"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -70,7 +80,7 @@ func fetchComponentStatusList(client *kubernetes.Clientset) {
 	if !shouldFetch(key) {
 		return
 	}
-	l, _ := client.CoreV1().ComponentStatuses().List(metav1.ListOptions{})
+	l, _ := client.CoreV1().ComponentStatuses().List(context.TODO(), metav1.ListOptions{})
 	componentStatusList.Store(l)
 	updateLastFetchedAt(key)
 }
@@ -100,7 +110,7 @@ func fetchConfigMapList(client *kubernetes.Clientset, namespace string) {
 		return
 	}
 	updateLastFetchedAt(key)
-	l, _ := client.CoreV1().ConfigMaps(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().ConfigMaps(namespace).List(context.TODO(), metav1.ListOptions{})
 	configMapsList.Store(l)
 }
 
@@ -160,18 +170,192 @@ func fetchPods(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	podList.Store(namespace, l)
 }
 
+// 路径补全函数
+func completerfile(path string, dirOnly bool) []prompt.Suggest {
+	var dir string
+	var isRelative bool
+
+	if path == "" || path == "/" {
+		dir = "/"
+	} else if strings.HasPrefix(path, "./") {
+		dir = filepath.Clean(path)
+		isRelative = true
+	} else if filepath.IsAbs(path) {
+		if strings.HasSuffix(path, "/.") {
+			dir = path
+		} else {
+			dir = filepath.Clean(path)
+		}
+	} else {
+		dir = filepath.Join(".", path)
+	}
+
+	// 如果路径以 / 结尾或者是 "." 或 ".."，我们应该列出该目录的内容
+	if strings.HasSuffix(path, "/") || path == "." || path == ".." {
+		// if strings.HasSuffix(path, "/") {
+		dir = path
+	} else {
+		// 否则，我们列出父目录的内容
+		dir = filepath.Dir(dir)
+	}
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return []prompt.Suggest{}
+	}
+
+	var suggestions []prompt.Suggest
+
+	for _, file := range files {
+		// 如果 dirOnly 为 true 且当前项不是目录，则跳过
+		if dirOnly && !file.IsDir() {
+			continue
+		}
+		name := file.Name()
+		var fullPath string
+
+		if isRelative {
+			relPath, _ := filepath.Rel(".", filepath.Join(dir, name))
+			fullPath = "./" + relPath
+		} else if dir == "/" {
+			fullPath = "/" + name
+		} else {
+			fullPath = filepath.Join(dir, name)
+		}
+
+		if file.IsDir() {
+			fullPath += string(os.PathSeparator)
+		}
+
+		// 如果路径以 / 结尾或者是 "." 或 ".."，我们显示所有文件和目录
+		// 否则，我们只显示与最后一个路径组件匹配的建议
+		if strings.HasSuffix(path, "/") || path == "." || path == ".." ||
+			strings.HasPrefix(strings.ToLower(name), strings.ToLower(filepath.Base(path))) {
+			suggestions = append(suggestions, prompt.Suggest{
+				Text: fullPath,
+				Description: func() string {
+					if file.IsDir() {
+						return "目录"
+					}
+					return "文件"
+				}(),
+			})
+		}
+	}
+
+	return suggestions
+}
+
+func lsfiles(argfs string, client *kubernetes.Clientset, namespace string, config *rest.Config, d prompt.Document, dirmode bool) []prompt.Suggest {
+	if strings.HasPrefix(argfs, ".") || strings.HasPrefix(argfs, "/") {
+		return prompt.FilterContains(completerfile(argfs, dirmode), argfs, true)
+		// return completerfile(argfs)
+	} else if strings.Contains(argfs, ":") {
+		return getpodfiles(client, namespace, config, argfs, dirmode) // return
+	} else {
+		return prompt.FilterContains(getPodSuggestions(client, namespace), argfs, true)
+		// return getPodSuggestions(client, namespace)
+	}
+}
+
+func getpodfiles(client *kubernetes.Clientset, namespace string, config *rest.Config, podname string, dirOnly bool) []prompt.Suggest {
+	var podnames []string
+	var cmd []string
+	if strings.Contains(podname, ":") {
+		podnames = strings.SplitN(podname, ":", 2)
+	}
+	//if len(podnames) >= 2 {
+	//	fmt.Println("冒号前的内容:", podnames[0])
+	//} else {
+	//	fmt.Println("字符串中没有找到冒号", podnames, podname)
+	//}
+	if podnames[1] == "" || podnames[1] == "/" {
+		cmd = []string{"sh", "-c", "ls -pd /* /.[!.]* 2>/dev/null || true"}
+	} else {
+		if strings.HasPrefix(podnames[1], "/") {
+			// 移除开头的/
+			// ls -pd /ro*
+			// podnamespath := strings.TrimPrefix(podnames[1], "/")
+			// fmt.Println(podnames[1])
+			cmd = []string{"sh", "-c", fmt.Sprintf("ls -pd %s* %s.[!.]* 2>/dev/null || true", podnames[1], podnames[1])}
+		} else {
+			return []prompt.Suggest{}
+		}
+	}
+	req := client.CoreV1().RESTClient().Post().
+		Resource("pods").
+		Name(podnames[0]).
+		Namespace(namespace).
+		SubResource("exec")
+
+	req.VersionedParams(&corev1.PodExecOptions{
+		// Container: containerName,
+		Stdin:   false,
+		Stdout:  true,
+		Stderr:  true,
+		TTY:     false,
+		Command: cmd,
+	}, scheme.ParameterCodec)
+	// 5. 执行命令并获取输出
+	executor, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	if err != nil {
+		panic(err.Error())
+	}
+	var stdoutBuffer, stderrBuffer bytes.Buffer
+	streamOpts := remotecommand.StreamOptions{
+		Stdin:  nil,
+		Stdout: &stdoutBuffer,
+		Stderr: &stderrBuffer,
+		Tty:    false,
+	}
+	err = executor.Stream(streamOpts)
+	if err != nil {
+		// fmt.Println("执行命令失败:", err)
+		// todo:可以输出debug日志
+		return []prompt.Suggest{}
+	}
+	stdout := stdoutBuffer.String()
+	stderr := stderrBuffer.String()
+	if stderr != "" {
+		// fmt.Println("执行命令失败:", stderr)
+		// todo:可以输出debug日志
+		return []prompt.Suggest{}
+	}
+	lines := strings.Split(stdout, "\n")
+	// fmt.Println(lines)
+	var suggestions []prompt.Suggest
+	for _, line := range lines {
+		if strings.Contains(line, "[") || line == "" {
+			continue
+		}
+		if strings.HasSuffix(line, "/") {
+			suggestions = append(suggestions, prompt.Suggest{
+				Text:        line,
+				Description: "目录",
+			})
+		} else if !dirOnly {
+			suggestions = append(suggestions, prompt.Suggest{
+				Text:        line,
+				Description: "文件",
+			})
+		}
+	}
+	return suggestions
+}
+
 func getPodSuggestions(client *kubernetes.Clientset, namespace string) []prompt.Suggest {
-	go fetchPods(client, namespace)
+	// go fetchPods(client, namespace)
+	fetchPods(client, namespace)
 	x, ok := podList.Load(namespace)
 	if !ok {
 		return []prompt.Suggest{}
 	}
 	l, ok := x.(*corev1.PodList)
 	if !ok || len(l.Items) == 0 {
+		fmt.Println("8888888")
 		return []prompt.Suggest{}
 	}
 	s := make([]prompt.Suggest, len(l.Items))
@@ -289,7 +473,7 @@ func fetchDaemonSetList(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.AppsV1().DaemonSets(namespace).List(metav1.ListOptions{})
+	l, _ := client.AppsV1().DaemonSets(namespace).List(context.TODO(), metav1.ListOptions{})
 	daemonSetList.Store(namespace, l)
 	return
 }
@@ -324,7 +508,7 @@ func fetchDeployments(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.AppsV1().Deployments(namespace).List(metav1.ListOptions{})
+	l, _ := client.AppsV1().Deployments(namespace).List(context.TODO(), metav1.ListOptions{})
 	deploymentList.Store(namespace, l)
 	return
 }
@@ -359,7 +543,7 @@ func fetchEndpoints(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().Endpoints(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().Endpoints(namespace).List(context.TODO(), metav1.ListOptions{})
 	endpointList.Store(key, l)
 	return
 }
@@ -394,7 +578,7 @@ func fetchEvents(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().Events(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().Events(namespace).List(context.TODO(), metav1.ListOptions{})
 	eventList.Store(namespace, l)
 	return
 }
@@ -429,7 +613,7 @@ func fetchNodeList(client *kubernetes.Clientset) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().Nodes().List(metav1.ListOptions{})
+	l, _ := client.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	nodeList.Store(l)
 	return
 }
@@ -460,7 +644,7 @@ func fetchSecretList(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().Secrets(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().Secrets(namespace).List(context.TODO(), metav1.ListOptions{})
 	secretList.Store(namespace, l)
 	return
 }
@@ -495,7 +679,7 @@ func fetchIngresses(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.ExtensionsV1beta1().Ingresses(namespace).List(metav1.ListOptions{})
+	l, _ := client.ExtensionsV1beta1().Ingresses(namespace).List(context.TODO(), metav1.ListOptions{})
 	ingressList.Store(namespace, l)
 }
 
@@ -534,7 +718,7 @@ func fetchLimitRangeList(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().LimitRanges(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().LimitRanges(namespace).List(context.TODO(), metav1.ListOptions{})
 	limitRangeList.Store(namespace, l)
 	return
 }
@@ -584,7 +768,7 @@ func fetchPersistentVolumeClaimsList(client *kubernetes.Clientset, namespace str
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().PersistentVolumeClaims(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().PersistentVolumeClaims(namespace).List(context.TODO(), metav1.ListOptions{})
 	persistentVolumeClaimsList.Store(namespace, l)
 	return
 }
@@ -619,7 +803,7 @@ func fetchPersistentVolumeList(client *kubernetes.Clientset) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().PersistentVolumes().List(metav1.ListOptions{})
+	l, _ := client.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
 	persistentVolumesList.Store(l)
 	return
 }
@@ -650,7 +834,7 @@ func fetchPodSecurityPolicyList(client *kubernetes.Clientset) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.ExtensionsV1beta1().PodSecurityPolicies().List(metav1.ListOptions{})
+	l, _ := client.ExtensionsV1beta1().PodSecurityPolicies().List(context.TODO(), metav1.ListOptions{})
 	podSecurityPolicyList.Store(l)
 	return
 }
@@ -681,7 +865,7 @@ func fetchPodTemplateList(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().PodTemplates(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().PodTemplates(namespace).List(context.TODO(), metav1.ListOptions{})
 	podTemplateList.Store(namespace, l)
 	return
 }
@@ -716,7 +900,7 @@ func fetchReplicaSetList(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.AppsV1beta2().ReplicaSets(namespace).List(metav1.ListOptions{})
+	l, _ := client.AppsV1beta2().ReplicaSets(namespace).List(context.TODO(), metav1.ListOptions{})
 	replicaSetList.Store(namespace, l)
 	return
 }
@@ -751,7 +935,7 @@ func fetchReplicationControllerList(client *kubernetes.Clientset, namespace stri
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().ReplicationControllers(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().ReplicationControllers(namespace).List(context.TODO(), metav1.ListOptions{})
 	replicationControllerList.Store(namespace, l)
 	return
 }
@@ -786,7 +970,7 @@ func fetchResourceQuotaList(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().ResourceQuotas(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().ResourceQuotas(namespace).List(context.TODO(), metav1.ListOptions{})
 	resourceQuotaList.Store(namespace, l)
 	return
 }
@@ -821,7 +1005,7 @@ func fetchServiceAccountList(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().ServiceAccounts(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().ServiceAccounts(namespace).List(context.TODO(), metav1.ListOptions{})
 	serviceAccountList.Store(namespace, l)
 	return
 }
@@ -856,7 +1040,7 @@ func fetchServiceList(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.CoreV1().Services(namespace).List(metav1.ListOptions{})
+	l, _ := client.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{})
 	serviceList.Store(namespace, l)
 	return
 }
@@ -891,7 +1075,7 @@ func fetchJobs(client *kubernetes.Clientset, namespace string) {
 	}
 	updateLastFetchedAt(key)
 
-	l, _ := client.BatchV1().Jobs(namespace).List(metav1.ListOptions{})
+	l, _ := client.BatchV1().Jobs(namespace).List(context.TODO(), metav1.ListOptions{})
 	jobList.Store(namespace, l)
 }
 
