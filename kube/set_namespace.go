@@ -43,7 +43,7 @@ func createTempKubeconfig(namespaceName string) (string, error) {
 	}
 
 	// 创建临时文件
-	tempFile, err := ioutil.TempFile("/tmp", ".kubeconfig-*.yaml")
+	tempFile, err := ioutil.TempFile(os.TempDir(), ".kubeconfig-*.yaml")
 	if err != nil {
 		return "", fmt.Errorf("failed to create temp file: %v", err)
 	}
