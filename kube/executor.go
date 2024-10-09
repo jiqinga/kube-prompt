@@ -1,28 +1,36 @@
 package kube
 
-import "C"
+// import "C"
 import (
 	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
-	"sync"
+
+	"github.com/jiqinga/kube-prompt/internal/debug"
 
 	"github.com/jiqinga/kubecolor/command"
-
-	//"bytes"
-
-	//"github.com/hidetatz/kubecolor/printer"
-
-	//"github.com/hidetatz/kubecolor/kubectl"
-	"github.com/jiqinga/kube-prompt/internal/debug"
 )
 
-var (
-	globalState sync.Map
-	Version     = "unset"
-)
+func ExecuteAndGetResults(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		debug.Log("you need to pass the something arguments")
+		return ""
+	}
+
+	out := &bytes.Buffer{}
+	cmd := exec.Command("/bin/sh", "-c", "kubectl "+s)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = out
+	if err := cmd.Run(); err != nil {
+		debug.Log(err.Error())
+		return ""
+	}
+	r := string(out.Bytes())
+	return r
+}
 
 func color(kargs, env []string) string {
 	_ = command.Run(kargs[1:], Version, env)
@@ -101,25 +109,6 @@ func Executor(s string) {
 	//}
 
 	return
-}
-
-func ExecuteAndGetResult(s string) string {
-	s = strings.TrimSpace(s)
-	if s == "" {
-		debug.Log("you need to pass the something arguments")
-		return ""
-	}
-
-	out := &bytes.Buffer{}
-	cmd := exec.Command("/bin/sh", "-c", "kubectl "+s)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = out
-	if err := cmd.Run(); err != nil {
-		debug.Log(err.Error())
-		return ""
-	}
-	r := string(out.Bytes())
-	return r
 }
 
 // 添加这个新函数

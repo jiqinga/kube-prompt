@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"strings"
+	"sync"
 
 	"k8s.io/client-go/rest"
 
@@ -14,6 +15,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+)
+
+var (
+	globalState sync.Map
+	Version     = "unset"
 )
 
 func Getns(key string) string {
