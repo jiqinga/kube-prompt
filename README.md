@@ -34,9 +34,8 @@
 <summary>macOS (darwin) - amd64</summary>
 
 ```bash
-wget https://github.com/jiqinga/kube-prompt/releases/download/v1.0.11/kube-prompt_v1.0.11_darwin_amd64.zip
-unzip kube-prompt_v1.0.11_darwin_amd64.zip
-chmod +x kube-prompt
+wget https://github.com/jiqinga/kube-prompt/releases/download/v0.1/kube-prompt_0.1_Darwin_x86_64.tar.gz
+tar -xf kube-prompt_0.1_Darwin_x86_64.tar.gz
 sudo mv ./kube-prompt /usr/local/bin/kube-prompt
 ```
 
@@ -46,9 +45,8 @@ sudo mv ./kube-prompt /usr/local/bin/kube-prompt
 <summary>Linux - amd64</summary>
 
 ```bash
-wget https://github.com/jiqinga/kube-prompt/releases/download/v1.0.11/kube-prompt_v1.0.11_linux_amd64.zip
-unzip kube-prompt_v1.0.11_linux_amd64.zip
-chmod +x kube-prompt
+wget https://github.com/jiqinga/kube-prompt/releases/download/v0.1/kube-prompt_0.1_Linux_x86_64.tar.gz
+tar -xf kube-prompt_0.1_Linux_x86_64.tar.gz
 sudo mv ./kube-prompt /usr/local/bin/kube-prompt
 ```
 
