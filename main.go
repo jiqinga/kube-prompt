@@ -50,6 +50,9 @@ func main() {
 	p.Run()
 	defer func() {
 		// 删除临时文件
-		os.Remove(kube.Getns("KUBECONFIG"))
+		err := os.Remove(kube.Getns("KUBECONFIG"))
+		if err != nil {
+			return
+		}
 	}()
 }

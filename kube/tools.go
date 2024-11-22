@@ -14,7 +14,10 @@ func handleExit() {
 	rawModeOff := exec.Command("/bin/stty", "-raw", "echo")
 	rawModeOff.Stdin = os.Stdin
 	_ = rawModeOff.Run()
-	rawModeOff.Wait()
+	err := rawModeOff.Wait()
+	if err != nil {
+		return
+	}
 }
 
 var ExitChan = make(chan os.Signal, 1)
