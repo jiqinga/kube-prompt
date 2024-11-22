@@ -50,14 +50,9 @@ func Executor(s string) {
 	if s == "" {
 		return
 	} else if s == "quit" || s == "exit" {
-		// 修复退出时导致终端字符不显示
-		cmd := exec.Command("reset")
-		_ = cmd.Run()
-		fmt.Println("Bye!")
-
-		os.Remove(Getns("KUBECONFIG"))
-
-		os.Exit(0)
+		// 恢复终端状态
+		// 通知主程序优雅退出
+		close(ExitChan)
 		return
 	}
 	if o := strings.Fields(s); o[0] == "set" {
@@ -65,11 +60,10 @@ func Executor(s string) {
 			tempfile, err := createTempKubeconfig(c[2])
 			if err != nil {
 				fmt.Println(err)
+				// 恢复终端状态
+				// 通知主程序优雅退出
+				close(ExitChan)
 				return
-			}
-			if err != nil {
-				fmt.Println("error", err)
-				os.Exit(1)
 			}
 			// completer := &Completer{} // 假设你已经有了这个实例
 			// completer.namespace = "s[:len(s)-1]"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	prompt "github.com/c-bata/go-prompt"
+	"github.com/c-bata/go-prompt"
 	"github.com/jiqinga/kube-prompt/internal/debug"
 	"github.com/jiqinga/kube-prompt/kube"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -18,7 +18,9 @@ func main() {
 	c, err := kube.NewCompleter("")
 	if err != nil {
 		fmt.Println("error", err)
-		os.Exit(1)
+		// 恢复终端状态
+		// 通知主程序优雅退出
+		close(kube.ExitChan)
 	}
 	defer debug.Teardown()
 	fmt.Printf("kube-prompt %s \n", version)

@@ -54,7 +54,7 @@ sudo mv ./kube-prompt /usr/local/bin/kube-prompt
 ### 从源码构建
 
 ```bash
-GO111MODULE=on go build .
+go build .
 ```
 
 ## 🚀 快速开始
