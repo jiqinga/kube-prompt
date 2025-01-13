@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"_tools/internal/optionconv"
-	prompt "github.com/c-bata/go-prompt"
+	prompt "github.com/elk-language/go-prompt"
 )
 
 func ExampleGetOptionsFromHelpText() {

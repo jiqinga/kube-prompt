@@ -3,9 +3,8 @@ module github.com/jiqinga/kube-prompt
 go 1.18
 
 require (
-	github.com/c-bata/go-prompt v0.2.6
-	github.com/gookit/goutil v0.6.16
-	github.com/jiqinga/kubecolor v0.0.1
+	github.com/elk-language/go-prompt v1.1.5
+	github.com/jiqinga/kubecolor v0.0.2
 	k8s.io/api v0.26.15
 	k8s.io/apimachinery v0.26.15
 	k8s.io/client-go v0.26.15
@@ -36,7 +35,9 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pkg/term v1.2.0-beta.2 // indirect
+	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect

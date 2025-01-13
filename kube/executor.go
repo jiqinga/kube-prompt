@@ -52,7 +52,8 @@ func Executor(s string) {
 	} else if s == "quit" || s == "exit" {
 		// 恢复终端状态
 		// 通知主程序优雅退出
-		close(ExitChan)
+		// close(ExitChan)
+		Pstop()
 		return
 	}
 	if o := strings.Fields(s); o[0] == "set" {
@@ -62,20 +63,21 @@ func Executor(s string) {
 				fmt.Println(err)
 				// 恢复终端状态
 				// 通知主程序优雅退出
-				close(ExitChan)
+				// close(ExitChan)
+				Pstop()
 				return
 			}
 			// completer := &Completer{} // 假设你已经有了这个实例
 			// completer.namespace = "s[:len(s)-1]"
-			globalState.Store("KUBECONFIG", tempfile)
-			globalState.Store("namespace", c[2])
+			GlobalState.Store("KUBECONFIG", tempfile)
+			GlobalState.Store("namespace", c[2])
 			fmt.Printf("成功切换到命名空间: %s\n", c[2])
 
 			return
 		}
 	}
 	env := os.Environ()
-	value, ok := globalState.Load("KUBECONFIG")
+	value, ok := GlobalState.Load("KUBECONFIG")
 	if ok {
 		// 键 "KUBECONFIG" 存在
 		env = append(env, fmt.Sprintf("KUBECONFIG=%s", value))
@@ -107,5 +109,5 @@ func Executor(s string) {
 
 // 添加这个新函数
 func GetGlobalState(key string) (interface{}, bool) {
-	return globalState.Load(key)
+	return GlobalState.Load(key)
 }

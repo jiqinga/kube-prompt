@@ -18,7 +18,7 @@ import (
 
 	"k8s.io/client-go/tools/remotecommand"
 
-	"github.com/c-bata/go-prompt"
+	"github.com/elk-language/go-prompt"
 	"github.com/jiqinga/kube-prompt/internal/debug"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"

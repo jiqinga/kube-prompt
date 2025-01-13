@@ -6,24 +6,24 @@ import (
 	"strings"
 	"sync"
 
-	"k8s.io/client-go/rest"
-
-	"github.com/c-bata/go-prompt"
-	"github.com/c-bata/go-prompt/completer"
+	"github.com/elk-language/go-prompt"
+	"github.com/elk-language/go-prompt/completer"
+	pstrings "github.com/elk-language/go-prompt/strings"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
-	globalState sync.Map
+	GlobalState sync.Map
 	Version     = "unset"
 )
 
 func Getns(key string) string {
-	value, ok := globalState.Load(key)
+	value, ok := GlobalState.Load(key)
 	if !ok {
 		// 键 "KUBECONFIG" 不存在
 		return ""
@@ -51,7 +51,7 @@ func NewCompleter(kubeconfigPath string) (*Completer, error) {
 	}
 
 	namespace, _, err := loader.Namespace()
-	globalState.Store("namespace", namespace)
+	GlobalState.Store("namespace", namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -96,11 +96,14 @@ func removeSpaces(slice []string) []string {
 	return s
 }
 
-func (c *Completer) Complete(d prompt.Document) []prompt.Suggest {
+func (c *Completer) Complete(d prompt.Document) ([]prompt.Suggest, pstrings.RuneNumber, pstrings.RuneNumber) {
+	endIndex := d.CurrentRuneIndex()
+	a := d.GetWordBeforeCursor()
+	startIndex := endIndex - pstrings.RuneCount([]byte(a))
 	// out := os.Stdout
 	// fmt.Fprintln(out, d.CurrentLine())
 	if d.TextBeforeCursor() == "" {
-		return []prompt.Suggest{}
+		return []prompt.Suggest{}, startIndex, endIndex
 	}
 	// 如果多空格个,空格也会当作参数
 	args := strings.Split(d.TextBeforeCursor(), " ")
@@ -110,18 +113,18 @@ func (c *Completer) Complete(d prompt.Document) []prompt.Suggest {
 	// If PIPE is in text before the cursor, returns empty suggestions.
 	for i := range args {
 		if args[i] == "|" {
-			return []prompt.Suggest{}
+			return []prompt.Suggest{}, startIndex, endIndex
 		}
 	}
 
 	// If word before the cursor starts with "-", returns CLI flag options.
 	if strings.HasPrefix(w, "-") {
-		return optionCompleter(args, strings.HasPrefix(w, "--"))
+		return optionCompleter(args, strings.HasPrefix(w, "--")), startIndex, endIndex
 	}
 
 	// Return suggestions for option
 	if suggests, found := c.completeOptionArguments(d); found {
-		return suggests
+		return suggests, startIndex, endIndex
 	}
 
 	namespace := checkNamespaceArg(d)
@@ -132,7 +135,7 @@ func (c *Completer) Complete(d prompt.Document) []prompt.Suggest {
 	if skipNext {
 		// when type 'get pod -o ', we don't want to complete pods. we want to type 'json' or other.
 		// So we need to skip argumentCompleter.
-		return []prompt.Suggest{}
+		return []prompt.Suggest{}, startIndex, endIndex
 	}
 	//if len(w) > 0 && w[len(w)-1] == '/' {
 	//	return c.argumentsCompleter(namespace, commandArgs, d)
@@ -141,10 +144,10 @@ func (c *Completer) Complete(d prompt.Document) []prompt.Suggest {
 	if strings.TrimSpace(commandArgs[len(commandArgs)-1]) == "" {
 		commandArgs := removeSpaces(commandArgs)
 		commandArgs = append(commandArgs, "")
-		return c.argumentsCompleter(namespace, commandArgs, d)
+		return c.argumentsCompleter(namespace, commandArgs, d), startIndex, endIndex
 	}
 	commandArgs = removeSpaces(commandArgs)
-	return c.argumentsCompleter(namespace, commandArgs, d)
+	return c.argumentsCompleter(namespace, commandArgs, d), startIndex, endIndex
 }
 
 func checkNamespaceArg(d prompt.Document) string {

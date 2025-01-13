@@ -1,7 +1,7 @@
 package kube
 
 import (
-	"github.com/c-bata/go-prompt"
+	"github.com/elk-language/go-prompt"
 )
 
 var commands = []prompt.Suggest{

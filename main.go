@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/c-bata/go-prompt"
+	"github.com/elk-language/go-prompt"
 	"github.com/jiqinga/kube-prompt/internal/debug"
 	"github.com/jiqinga/kube-prompt/kube"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -20,7 +20,8 @@ func main() {
 		fmt.Println("error", err)
 		// 恢复终端状态
 		// 通知主程序优雅退出
-		close(kube.ExitChan)
+		// close(kube.ExitChan)
+		kube.Pstop()
 	}
 	defer debug.Teardown()
 	fmt.Printf("kube-prompt %s \n", version)
@@ -34,18 +35,19 @@ func main() {
 		}
 		return ns.(string)
 	}
+
 	p := prompt.New(
 		kube.Executor,
-		c.Complete,
-		prompt.OptionTitle("kube-prompt: interactive kubernetes client"),
+		prompt.WithCompleter(c.Complete),
+		prompt.WithTitle("kube-prompt: interactive kubernetes client"),
 		// prompt.OptionPrefix(">>> "),
-		prompt.OptionPrefix(getCurrentNamespace()+">>> "), // 初始提示符
-		prompt.OptionLivePrefix(func() (string, bool) {
-			return getCurrentNamespace() + ">>> ", true
+		prompt.WithPrefix(getCurrentNamespace()+">>> "), // 初始提示符
+		prompt.WithPrefixCallback(func() string {
+			return getCurrentNamespace() + ">>> "
 		}),
-		prompt.OptionCompletionWordSeparator(string([]byte{' ', ':'})),
+		prompt.WithCompletionWordSeparator(string([]byte{' ', ':'})),
 		// prompt.OptionCompletionWordSeparator(completer.FilePathCompletionSeparator),
-		prompt.OptionInputTextColor(prompt.Yellow),
+		prompt.WithInputTextColor(prompt.Yellow),
 	)
 	p.Run()
 	defer func() {

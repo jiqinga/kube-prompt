@@ -7,7 +7,7 @@ import (
 
 	"_tools/ai"
 
-	"github.com/c-bata/go-prompt"
+	"github.com/elk-language/go-prompt"
 )
 
 func GetOptionsFromHelpText(help string) (options string, err error) {
